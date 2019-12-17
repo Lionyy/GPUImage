@@ -529,6 +529,17 @@ static CVReturn renderCallback(CVDisplayLinkRef displayLink,
     }
 }
 
+- (void)synProcessMovieFrame:(CVPixelBufferRef)movieFrame withSampleTime:(CMTime)currentSampleTime
+{
+    if(movieFrame) {
+        __unsafe_unretained GPUImageMovie *weakSelf = self;
+        runSynchronouslyOnVideoProcessingQueue(^{
+            [weakSelf processMovieFrame:movieFrame withSampleTime:currentSampleTime];
+            CFRelease(movieFrame);
+        });
+    }
+}
+
 - (void)processMovieFrame:(CVPixelBufferRef)movieFrame withSampleTime:(CMTime)currentSampleTime
 {
     int bufferHeight = (int) CVPixelBufferGetHeight(movieFrame);
